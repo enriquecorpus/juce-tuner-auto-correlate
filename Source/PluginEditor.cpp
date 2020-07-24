@@ -74,20 +74,21 @@ void Pitchdetect_autocorrelateAudioProcessorEditor::timerCallback()
 {
         Pitchdetect_autocorrelateAudioProcessor& ourProcessor = getProcessor();
 
-        double key = ourProcessor.pitch;
-    if(key <= 0.0f){
-        infoLabel.setText("--",juce::dontSendNotification);
-         return;
+        double key = ourProcessor.pitch / 2;
+        
+        if(key <= 0.0f)
+        {
+            infoLabel.setText("--",juce::dontSendNotification);
+            return;
         }
        
 
         std::map<double, std::string> data = {{16.35, "C0"}, {18.35, "D0"}, {210.60, "E0"}};
+        double nearestKey = findClosestKey(data, key);
+        double cents = key - nearestKey;
 
-//        std::cout << "Provided key: " << key << ", closest key: " << findClosestKey(data, key) << std::endl;
-//        std::cout << "Key value: " << data[findClosestKey(data, key)]  << std::endl;
     
-    
-        infoLabel.setText((String)data[findClosestKey(data, key)],juce::dontSendNotification);
+        infoLabel.setText((String)data[nearestKey] + " cents: " + (String)cents,juce::dontSendNotification);
         
         //delaySlider.setValue (ourProcessor.delay->getValue(), dontSendNotification);
 }
