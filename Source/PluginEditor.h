@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "AppInc.h"
 
 //==============================================================================
 /**
@@ -32,11 +33,24 @@ private:
     // access the processor object that created it.
     Pitchdetect_autocorrelateAudioProcessor& processor;
 
-    Label infoLabel;
+    
     Pitchdetect_autocorrelateAudioProcessor& getProcessor() const
          {
              return static_cast<Pitchdetect_autocorrelateAudioProcessor&> (processor);
          }
+    
+    
+    
+    AppLookAndFeelCls aLAF;
+    PowerButtonLookAndFeel pbLAF;
+
+    ToggleButton power;
+    Label infoLabel;
+    Slider sliderFlat;
+    Slider sliderSharp;
+
+    
+    //TODO ADD ARROW BUTTON
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Pitchdetect_autocorrelateAudioProcessorEditor)
 };
