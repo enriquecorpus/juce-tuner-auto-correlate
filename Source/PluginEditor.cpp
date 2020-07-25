@@ -21,7 +21,7 @@ Pitchdetect_autocorrelateAudioProcessorEditor::Pitchdetect_autocorrelateAudioPro
     
     addAndMakeVisible (infoLabel);
     infoLabel.setLookAndFeel(&aLAF);
-    infoLabel.setText ("A4", juce::dontSendNotification);
+    infoLabel.setText ("--", juce::dontSendNotification);
     infoLabel.setColour (juce::Label::textColourId, juce::Colours::orange);
     infoLabel.setJustificationType (juce::Justification::centred);
     infoLabel.setFont (juce::Font (70.0f, juce::Font::bold));
@@ -31,11 +31,13 @@ Pitchdetect_autocorrelateAudioProcessorEditor::Pitchdetect_autocorrelateAudioPro
     sliderFlat.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
     sliderFlat.setRange(0, 50.00);
     sliderFlat.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    sliderFlat.setScrollWheelEnabled (false);
     
     addAndMakeVisible(sliderSharp);
     sliderSharp.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
     sliderSharp.setRange(0, 50.00);
     sliderSharp.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    sliderSharp.setScrollWheelEnabled (false);
 
     
     
@@ -118,7 +120,7 @@ void Pitchdetect_autocorrelateAudioProcessorEditor::timerCallback()
         
         if(key <= 0.0f)
         {
-          //  infoLabel.setText("--",juce::dontSendNotification);
+           infoLabel.setText("--",juce::dontSendNotification);
             return;
         }
        
@@ -128,5 +130,6 @@ void Pitchdetect_autocorrelateAudioProcessorEditor::timerCallback()
         double cents = key - nearestKey;
 
     
-        infoLabel.setText((String)data[nearestKey] + " cents: " + (String)cents,juce::dontSendNotification);
+//        infoLabel.setText((String)data[nearestKey] + " cents: " + (String)cents,juce::dontSendNotification);
+     infoLabel.setText((String)data[nearestKey],juce::dontSendNotification);
         }
