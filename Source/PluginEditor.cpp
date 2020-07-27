@@ -45,10 +45,21 @@ Pitchdetect_autocorrelateAudioProcessorEditor::Pitchdetect_autocorrelateAudioPro
     power.setLookAndFeel(&pbLAF);
     power.onClick = [this] {
        //Do something with the ui
+        sliderSharp.setEnabled(power.getToggleState());
+        sliderFlat.setEnabled(power.getToggleState());
+       
+        if(power.getToggleState()){
+            startTimer (50);
+        }else {
+            stopTimer();
+            sliderSharp.setValue(0.0f);
+            sliderFlat.setValue(0.0f);
+            noteNameLabel.setText("--",juce::dontSendNotification);
+        }
     };
 
     setSize (492, 162);
-    startTimer (50);
+    
 }
 
 Pitchdetect_autocorrelateAudioProcessorEditor::~Pitchdetect_autocorrelateAudioProcessorEditor()
