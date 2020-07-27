@@ -19,12 +19,12 @@ Pitchdetect_autocorrelateAudioProcessorEditor::Pitchdetect_autocorrelateAudioPro
     // editor's size to whatever you need it to be.
     setLookAndFeel(&aLAF);
     
-    addAndMakeVisible (infoLabel);
-    infoLabel.setLookAndFeel(&aLAF);
-    infoLabel.setText ("--", juce::dontSendNotification);
-    infoLabel.setColour (juce::Label::textColourId, juce::Colours::orange);
-    infoLabel.setJustificationType (juce::Justification::centred);
-    infoLabel.setFont (juce::Font (70.0f, juce::Font::bold));
+    addAndMakeVisible (noteNameLabel);
+    noteNameLabel.setLookAndFeel(&aLAF);
+    noteNameLabel.setText ("--", juce::dontSendNotification);
+    noteNameLabel.setColour (juce::Label::textColourId, juce::Colours::orange);
+    noteNameLabel.setJustificationType (juce::Justification::centred);
+    noteNameLabel.setFont (juce::Font (70.0f, juce::Font::bold));
     
     
     addAndMakeVisible(sliderFlat);
@@ -84,52 +84,58 @@ void Pitchdetect_autocorrelateAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-        infoLabel.setBounds (0,  40, getWidth(),  70);
+        noteNameLabel.setBounds (0,  40, getWidth(),  70);
         power.setBounds(10, 40, 50, 50);
     
         sliderFlat.setBounds(70, 20, 100, 100);
         sliderSharp.setBounds(315, 20, 100, 100);
 }
 
-template <typename T1, typename T2>
-T1 findClosestKey(const std::map<T1, T2> & data, T1 key)
-{
-    if (data.size() == 0) {
-        throw std::out_of_range("Received empty map.");
+double noteFromPitch(float frequency) {
+    double noteNum = 12 * (log(frequency / 440) / log(2));
+    noteNum = round(noteNum) + 69;
+    return noteNum;
+}
+
+float frequencyFromNoteNumber(float note) {
+    return 440 * pow(2, (note - 69) / 12);
+}
+
+double centsOffFromPitch(float frequency, float note) {
+    float frqFromNote = frequencyFromNoteNumber(note);
+    float logOfPitch = log(frequency / frqFromNote);
+    return floor(1200 * logOfPitch) / log(2);
+}
+
+void Pitchdetect_autocorrelateAudioProcessorEditor::updateWidgetValues(String noteName, float pitchTune) {
+    noteNameLabel.setText("--",juce::dontSendNotification);
+    sliderFlat.setValue(0.0f);
+    sliderSharp.setValue(0.0f);
+    
+    //TODO change colours of text to green
+    if(pitchTune == 0.0f)
+        return;
+    
+    if(pitchTune < 0.0f){
+        sliderFlat.setValue(abs(pitchTune));
     }
 
-    auto lower = data.lower_bound(key);
-
-    if (lower == data.end()) // If none found, return the last one.
-        return std::prev(lower)->first;
-
-    if (lower == data.begin())
-        return lower->first;
-
-    // Check which one is closest.
-    auto previous = std::prev(lower);
-    if ((key - previous->first) < (lower->first - key))
-        return previous->first;
-
-    return lower->first;
+    if(pitchTune > 0.0f){
+        sliderSharp.setValue(pitchTune);
+    }
+    noteNameLabel.setText(noteName,juce::dontSendNotification);
 }
 void Pitchdetect_autocorrelateAudioProcessorEditor::timerCallback()
 {
         Pitchdetect_autocorrelateAudioProcessor& ourProcessor = getProcessor();
         double key = ourProcessor.pitch / 2;
         
-        if(key <= 0.0f)
-        {
-           infoLabel.setText("--",juce::dontSendNotification);
-            return;
-        }
-       
-        //TODO PUT CORRECT MAPPING HERE
-        std::map<double, std::string> data = {{16.35, "C0"}, {18.35, "D0"}, {210.60, "E0"}};
-        double nearestKey = findClosestKey(data, key);
-        double cents = key - nearestKey;
+        std::array<String, 12> not = { "C","C#","D","Eb","E","F","F#","G","G#","A","Bb","B"};
 
-    
-//        infoLabel.setText((String)data[nearestKey] + " cents: " + (String)cents,juce::dontSendNotification);
-     infoLabel.setText((String)data[nearestKey],juce::dontSendNotification);
-        }
+        int currentKey = noteFromPitch(key);
+        int Note = frequencyFromNoteNumber(currentKey);
+        float pitchTune = centsOffFromPitch(key, currentKey);
+        String noteName = (String)not[currentKey % 12]
+        
+        updateWidgetValues(noteName, pitchTune);
+}

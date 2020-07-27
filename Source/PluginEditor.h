@@ -27,6 +27,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     void timerCallback() override;
+    void updateWidgetValues(String noteName, float pitchTune);
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -45,7 +46,7 @@ private:
     PowerButtonLookAndFeel pbLAF;
 
     ToggleButton power;
-    Label infoLabel;
+    Label noteNameLabel;
     Slider sliderFlat;
     Slider sliderSharp;
 
