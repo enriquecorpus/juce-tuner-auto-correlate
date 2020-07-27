@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+class MeterComponent;
 #include "PluginProcessor.h"
 #include "AppInc.h"
 
@@ -28,7 +29,11 @@ public:
     void resized() override;
     void timerCallback() override;
     void updateWidgetValues(String noteName, float pitchTune);
-
+    enum designFlags {
+        GREY = 1,
+        ORANGE = 2,
+        GREEN = 3
+    } ;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -49,9 +54,12 @@ private:
     Label noteNameLabel;
     Slider sliderFlat;
     Slider sliderSharp;
-
     
-    //TODO ADD ARROW BUTTON
+    std::unique_ptr<MeterComponent> flatMeter;
+    std::unique_ptr<MeterComponent> sharpMeter;
+ 
+
+    int arrowColourFlags = GREY;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Pitchdetect_autocorrelateAudioProcessorEditor)
 };
